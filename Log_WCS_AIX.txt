@@ -1,0 +1,31 @@
+GUILWEB  - l'utilisateur est l'administrateur8153662
+ 20020403164415  DEBUG  CMN0301D: Query "UPDATE BUDGET SET BDBUDDEP = 0, BD1=0, BD2=0, BD3=0, BD4=0, BD5=0, BD6=0, BD7=0, BD
+8=0, BD9=0, BD10=0, BD11=0, BD12=0, BDDATE=TIMESTAMP(DATE('2002-03-01'),'00.00.01') WHERE BDSHNBR IN (SELECT SHRFNBR FROM SH
+OPPER,USERATTR WHERE SHRFNBR=USSHNBR AND SHLOGID LIKE 'M6%')"
+
+  - Recuperation du mois en cours et construction du champ BUDGET a updater
+  - Récupération des paramètres de la commande du client
+ 20020403164415  DEBUG  CMN0301D: Query " SELECT CAST(OR.ORFIELD2 AS INTEGER) AS SHOPPER, MONTH(ORPSTMP) AS MOIS, SUM(OR.ORP
+RTOT) AS BUDDEP FROM ORDERS OR, MCUSTINFO MC, SHOPGRP SG  WHERE OR.ORFIELD2 = MC.MCSHNBR AND MC.MCSGNBR = SG.SGRFNBR  AND SG
+.SGNAME = 'M6'  AND OR.ORPSTMP BETWEEN '2002-02-28-23.00.00' AND '2002-04-03-14.44.15' AND OR.ORFIELD3 IN ('VA', 'AD', 'AC',
+ 'LI', 'PU')  GROUP BY MONTH(ORPSTMP), OR.ORFIELD2 ORDER BY SHOPPER, MOIS
+"
+
+ NewShopper = 17178894
+ Mois (SQL) = 3 Budget dépensé = 20.81
+ Budget annuel dépensé = 20.81
+ Mois = 1 Budget dépensé = 0
+ Mois = 2 Budget dépensé = 0
+ Mois = 3 Budget dépensé = 20.81
+ Mois = 4 Budget dépensé = 0
+ Mois = 5 Budget dépensé = 0
+ Mois = 6 Budget dépensé = 0
+ Mois = 7 Budget dépensé = 0
+ Mois = 8 Budget dépensé = 0
+ Mois = 9 Budget dépensé = 0
+ Mois = 10 Budget dépensé = 0
+ Mois = 11 Budget dépensé = 0
+ Mois = 12 Budget dépensé = 0
+ 20020403164416  DEBUG  CMN0301D: Query "UPDATE BUDGET SET BDBUDDEP=20.8100 , BD1=0.0000 , BD2=0.0000 , BD3=20.8100 , BD4=0.
+0000 , BD5=0.0000 , BD6=0.0000 , BD7=0.0000 , BD8=0.0000 , BD9=0.0000 , BD10=0.0000 , BD11=0.0000 , BD12=0.0000 , BDDATE=TIM
+ESTAMP(DATE('2002-3-01'),'00.00.01') WHERE BDSHNBR = 17178894"

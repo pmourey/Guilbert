@@ -1,0 +1,35 @@
+Table statistics:
+
+F1: 100 * OVERFLOW / CARD < 5
+F2: 100 * TSIZE / ((FPAGES-1) * (TABLEPAGESIZE-76)) > 70
+F3: 100 * NPAGES / FPAGES > 80
+
+CREATOR   NAME                  CARD    OV    NP    FP    TSIZE  F1  F2 F3 REORG
+--------------------------------------------------------------------------------
+DB2ADM    STATS               302991     0 19072 19072 64537084   0  84 100 --- 
+--------------------------------------------------------------------------------
+
+Index statistics:
+
+F4: CLUSTERRATIO or normalized CLUSTERFACTOR > 80
+F5: 100 * (KEYS * (ISIZE+8) + (CARD-KEYS) * 4) / (NLEAF * INDEXPAGESIZE) > 50
+F6: (100-PCTFREE) * (INDEXPAGESIZE-96) / (ISIZE+12) ** (NLEVELS-2) * (INDEXPAGESIZE-96) / (KEYS * (ISIZE+8) + (CARD-KEYS) * 4) < 100
+
+CREATOR  NAME                 CARD  LEAF  LVLS ISIZE   KEYS   F4   F5  F6 REORG
+--------------------------------------------------------------------------------
+Table: DB2ADM.STATS
+DB2ADM   I_STATS1           302991  1855     4    84  57854  100   82   96 --- 
+DB2ADM   I_STATS2           302991  2100     4    88  66574   97   85   78 --- 
+DB2ADM   I_STATS3           302991   424     3    14   7025   92   77   41 --- 
+DB2ADM   I_STATS4           302991   397     3    12    634   95   75   48 --- 
+DB2ADM   I_STATS6           302991   379     3    12    516   62   78   48 *-- 
+DB2ADM   I_STATS8           302991  1820     4    76  60044   75   80  121 *-* 
+DB2ADM   P_STATS            302991  1010     3     4 302991   32   87   24 *-- 
+DB2ADM   SSIND_IMPUT        302991   418     3    16   8865   25   81   36 *-- 
+--------------------------------------------------------------------------------
+
+CLUSTERRATIO or normalized CLUSTERFACTOR (F4) will indicate REORG is necessary 
+for indexes that are not in the same sequence as the base table. When multiple 
+indexes are defined on a table, one or more indexes may be flagged as needing 
+REORG.  Specify the most important index for REORG sequencing.
+

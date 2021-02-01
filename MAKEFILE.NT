@@ -1,0 +1,57 @@
+## DESCRIPTION: Makefile to build the Net.Commerce command or function
+##
+## Instructions:
+## ------------
+##   - Modify the following variables as appropriate:
+##     - MODNAME - the base name of the source file and DLL
+##     - OUTDIR  - directory where the dll will reside
+##     - OUT     - the full path name for the dll
+##
+##   - Run VCVARS32 for VC++
+##   - Run the makfile as follows:
+##        non-debug version ->      nmake -f makefile.nt release
+##     or     debug version ->      nmake -f makefile.nt debug
+##
+
+NC_ROOT = M:\CommerceSuite
+
+MODNAME = MassImport
+OUTDIR  = bin
+OUT     = $(OUTDIR)\$(MODNAME).dll
+
+PCH     = objects\objects.pch
+INC     = /I$(NC_ROOT)\adt\include /I ..\common
+LIBS    = $(NC_ROOT)\adt\lib\nc3_containers.lib \
+          $(NC_ROOT)\adt\lib\nc3_messages.lib \
+          $(NC_ROOT)\adt\lib\nc3_common.lib \
+          $(NC_ROOT)\adt\lib\nc3_dbc.lib \
+          $(NC_ROOT)\adt\lib\server_objs.lib
+GCFLAGS = /nologo /c /GX $(COMPILE_F) /MD /W1 /D_X86=1 /D_X86_ \
+          /D_CONSOLE /DWIN32 $(INC) /YX"$(PCH)" /Gi
+GLFLAGS = /nologo $(LINK_F) /DLL /machine:IX86
+
+OBJS    = $(MODNAME).obj
+
+debug:
+        @nmake -f makefile.nt all       \
+             "COMPILE_F=/Zi /Gm /Od /DEBUG /D__TRACE__"     \
+             "LINK_F=/DEBUG" -NOLOGO
+
+release:
+        @nmake -f makefile.nt all       \
+             "COMPILE_F=/O2 /Og /Oi /Ot /Oy /Ob2 /Gs /Gf /Gy /G5 /DEBUG /D__TRACE__" -NOLOGO
+
+all :   $(MODNAME).dll
+##        copy $(MODNAME).dll $(NC_ROOT)\bin\
+
+$(MODNAME).dll : $(OBJS)
+             link $(OBJS) $(GLFLAGS) $(LIBS) /OUT:$(@R).dll /implib:$(@R).lib /PDB:$(@R).pdb
+
+$(MODNAME).obj : $(@R).cpp $(GLBDEP)
+                 cl $(GCFLAGS) $(@R).cpp
+
+clean :
+        del *.obj *.pdb *.idb *.ilk *.exp vc6?.*
+##        del $(OUTDIR)\$(MODNAME).dll
+
+

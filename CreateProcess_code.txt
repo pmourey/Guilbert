@@ -1,0 +1,29 @@
+BOOL retcode;
+
+lpStartupInfo 		= (LPSTARTUPINFO) malloc(sizeof(LPSTARTUPINFO));
+lpProcessInformation 	= (LPPROCESS_INFORMATION) malloc(sizeof(LPPROCESS_INFORMATION));
+
+retcode = CreateProcess((LPCTSTR) CommandMassEncap.c_str(), (LPTSTR) args, \
+			NULL, NULL, FALSE, DETACHED_PROCESS, \
+				NULL, (LPCTSTR) CHEMINOUT.c_str(), lpStartupInfo, lpProcessInformation);
+
+- CommandMassEncap.c_str() est une chaîne de caractère définissant le nom et chemin de l'exécutable à lancer:
+
+	"D:\IBM\CommerceSuite\xml\massimpt\massimptencap.exe"
+
+- args est un tableau de 6 chaînes de caractères définissant les différents arguments de la ligne de commande:
+
+	args[0] : D:\IBM\CommerceSuite\xml\massimpt\massimptencap.exe
+	args[1] : D:\IBM\CommerceSuite
+	args[2] : 1
+	args[3] : PMOUTEST
+	args[4] : wcs
+	args[5] : wcs
+
+- CHEMINOUT.c_str() est une chaîne de caractère définissant le répertoire de travail de l'exécutable:
+
+	"D:\IBM\CommerceSuite\xml\massimpt"
+
+- Comment faut-il remplir la structure lpStartupInfo?
+
+- Comment faut-il remplir la structure lpProcessInformation?

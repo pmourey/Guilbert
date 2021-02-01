@@ -1,0 +1,5 @@
+Appel du fils
+ pid du fork = 0
+ ReturnStatus ( db2 Import ) = 0
+ ReturnCode ( db2 Import ) = -263495872
+ fpid = -1

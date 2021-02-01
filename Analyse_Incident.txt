@@ -1,0 +1,15 @@
+1er écran:
+
+La date affichée de la commande est mise à jour à chaque fois que son statut est modifié (cf Workflow des commandes) dans le champ ORPSTMP de la table ORDERS.
+
+Est-ce iso-fonctionnel par rapport à Omega?
+
+2ème écran:
+
+La gestion des budgets est indépendant de l'année, pas géré dans la table BUDGET!...
+
+3ème écran:
+
+Bug dans le programme d'export des commandes. On insère dans la table STATS la date d'exportation de la commande, alors qu'il faut insérer la date de validation de la commande.
+
+Est-ce un bug? En effet, les commandes validées le jour J sont exportées à J+1!!!

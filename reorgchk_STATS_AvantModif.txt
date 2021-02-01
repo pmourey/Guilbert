@@ -1,0 +1,89 @@
+VOICI LES DIFFÉRENTES PROCÉDURES À SUIVRE POUR OPTIMISER LES ORDRES D'INSERTION DANS LA TABLE STATS:
+
+1) SUPPRESSION DES INDEXES REDONDANTS:
+
+select
+substr(TABNAME,1,10) as tabname,
+INDNAME,
+substr(COLNAMES,1,30) as colname,
+UNIQUERULE,
+MADE_UNIQUE
+from syscat.indexes
+where INDSCHEMA='DB2ADM'
+and TABNAME='STATS'
+order by 1,2
+
+TABNAME    INDNAME            COLNAME                        UNIQUERULE MADE_UNIQUE
+---------- ------------------ ------------------------------ ---------- -----------
+STATS      I_STATS1           +SSSGNBR+SSPRNBR               D          N          
+STATS      I_STATS2           +SSSGNBR+SSAN+SSPRNBR          D          N          
+STATS      I_STATS3           +SSSGNBR+SSFAM                 D          N          
+STATS      I_STATS4           +SSSGNBR+SSRUBRI               D          N          
+STATS      I_STATS5           +SSSGNBR+SSAN                  D          N          
+STATS      I_STATS6           +SSSGNBR+SSAN+SSMOIS           D          N          
+STATS      I_STATS7           +SSSGNBR                       D          N          
+STATS      P_STATS            +SSRFNBR                       P          N          
+STATS      SSIND_IMPUT        +SSIMPUT+SSMOIS                D          N          
+
+
+   L'index I_STATS1 est redondant avec I_STATS2
+   L'index I_STATS5 est redondant avec I_STATS2 et I_STATS6
+   L'index I_STATS7 est redondant avec I_STATS1-6
+   
+PRÉCONISATION:
+	
+	Ces 3 indexes peuvent dont être supprimés
+   
+2) DIMINUTION DE LA CARDINALITÉ DES INDEXES
+
+	navajo:/usr/lpp/CommerceSuite/instance/mser/logs> db2 reorgchk current statistics on table db2adm.stats
+
+	Table statistics:
+
+	F1: 100 * OVERFLOW / CARD < 5
+	F2: 100 * TSIZE / ((FPAGES-1) * (TABLEPAGESIZE-76)) > 70
+	F3: 100 * NPAGES / FPAGES > 80
+
+	CREATOR   NAME                  CARD    OV    NP    FP    TSIZE  F1  F2 F3 REORG
+	--------------------------------------------------------------------------------
+	DB2ADM    STATS               308503     0 16695 16992 64477128   0  94  98 --- 
+	--------------------------------------------------------------------------------
+
+	Index statistics:
+
+	F4: CLUSTERRATIO or normalized CLUSTERFACTOR > 80
+	F5: 100 * (KEYS * (ISIZE+8) + (CARD-KEYS) * 4) / (NLEAF * INDEXPAGESIZE) > 50
+	F6: (100-PCTFREE) * (INDEXPAGESIZE-96) / (ISIZE+12) ** (NLEVELS-2) * (INDEXPAGESIZE-96) / (KEYS * (ISIZE+8) + (C
+	ARD-KEYS) * 4) < 100
+
+	CREATOR  NAME                 CARD  LEAF  LVLS ISIZE   KEYS   F4   F5  F6 REORG
+	--------------------------------------------------------------------------------
+	Table: DB2ADM.STATS
+	DB2ADM   I_STATS1           308503  1246     3    70  43260   32   86    3 *-- 
+	DB2ADM   I_STATS2           308503  1518     3    74  53488   33   86    3 *-- 
+	DB2ADM   I_STATS3           308503   456     3    14   7014   53   72   40 *-- 
+	DB2ADM   I_STATS4           308503   431     3    12    634   78   70   48 *-- 
+	DB2ADM   I_STATS5           308503   420     3     8    128   97   71   58 --- 
+	DB2ADM   I_STATS6           308503   408     3    12    516   85   74   48 --- 
+	DB2ADM   I_STATS7           308503   439     3     4    105   97   68   72 --- 
+	DB2ADM   P_STATS            308503  1089     3     4 308503   99   82   24 --- 
+	DB2ADM   SSIND_IMPUT        308503   436     3    16   8979   73   79   36 *-- 
+	--------------------------------------------------------------------------------
+
+	CLUSTERRATIO or normalized CLUSTERFACTOR (F4) will indicate REORG is necessary 
+	for indexes that are not in the same sequence as the base table. When multiple 
+	indexes are defined on a table, one or more indexes may be flagged as needing 
+	REORG.  Specify the most important index for REORG sequencing.
+
+
+Un astérix (*) dans le champ "REORG" en première position indique que l'ordre physique de l'index n'est pas le même que celui de la table.
+Les autres positions indiquent un taux de défragmentation important des indexes.
+La cardinalité est définie dans le champ "KEYS" (= nombre de lignes moyennes par clef). Plus ce nombre est important, plus le nombre de pages crées par DB2 sera important, avec un risque d'avoir des pages disséminées un peuy partout sur le disque, et donc des temps d'accès plus important.
+La préconisation est de rajouter pour certains indexes des clefs supplémentaires suffisamment filtrantes pour diminuer cette cardinalité.
+
+PRÉCONISATION:
+
+	Pour l'index I_STAT1 (+SSSGNBR+SSPRNBR), rajouter le champ SSFAM.
+	Pour l'index I_STAT2 (+SSSGNBR+SSAN+SSPRNBR), rajouter le champ SSFAM
+	Pour l'index SSIND_IMPUT (+SSIMPUT+SSMOIS), rajouter le champ SSSGNBR.
+	
